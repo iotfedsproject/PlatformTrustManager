@@ -1,0 +1,35 @@
+language: java
+env:
+  global:
+  - GITHUB_REPO=symbiote-h2020/TrustManager
+  - secure: TkNRQw2ppIZwsn95QWwNoEDfHGJ33rnF/8VrbGL4ALoUguCdGkclWV2JzssfzseJvActT9bI4T+7EObLPd5yw0nCbyUBlQ57hitBvriOO/iMIpuwbMiL82fvS9i5tIiL2gHmW0ehz6s+UY55riKbOMgNummCAv4BFVobKa34ExRDfuGQt5MZMiTV1OivWAOUfGzI8LeTKSpswXKQ2qIGBNb2V5o0BDmVOQQ3ewvjRgGI07gV6Mz8tHTp9Nn4JaRIdo/vS8ep73rE7oqfH//WR0sELvsN8RZe8GjcsDvz9tcTnHpb5gZNePLZHz2GDM1f8xRJOsJvGt5Wj00hxzo17DyXaVBl5zHhgYQD+x1MX5AScmfIM/TWa3lkjRj5CO5/3XLAqJHiFEg5VEWKpJeHdk4mT0YCMEP8w66ngJ5FAHT9qXf7QSObZAcxk8QtraPEUHOIpinl0DeiJuXtJQrBXZcHMGR9nH7pfVCMomq0uhfBoamYBiXZVsCI1UuGu2iN/U7088UICKp+ncIOgsC6Fx9BWuB4xguhqjkH3e9Dh7QEQon93qLT++acOGQiM9Mi1J2w9PkkOBMbQd0IwSxBnIuXHGaKiwuI2W3r27pAzyTVldWXPjVKQNGLhQ2Qy3IBLe60FyaOrMUZsbVJxbbdD+2uWy4KtP1UaudLDvs6iZw=
+jdk:
+- oraclejdk8
+services:
+- mongodb
+- rabbitmq
+sudo: required
+branches:
+  only:
+  - staging
+install: true
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+before_script:
+- chmod a+x merge_script.sh
+- "./merge_script.sh"
+script:
+- gradle check --refresh-dependencies
+after_success:
+- chmod a+x pushing_script.sh
+- "./pushing_script.sh"
+- bash <(curl -s https://codecov.io/bash)
+notifications:
+  email:
+    on_success: never
+    on_failure: always
